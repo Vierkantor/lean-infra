@@ -47,6 +47,14 @@ EOF
           propagatedBuildInputs = [ tweepy PyGithub ];
           src = ./lean4-nightly-bot;
         };
+
+      velcom-bot =
+        with python3Packages;
+        buildPythonApplication {
+          name = "velcom-bot.py";
+          propagatedBuildInputs = [ python-zulip-api ];
+          src = ./velcom-bot;
+        };
     };
 
     nixosModule.config = {
@@ -70,6 +78,19 @@ EOF
           StateDirectory = "rss-bot";
           Type = "exec";
           ExecStart = "${packages.${system}.rss-bot}/bin/rss-bot --feed-file=${./rss-feeds} --data-dir=\${STATE_DIRECTORY} --pr-links";
+          TimeoutSec = "5min";
+        };
+      };
+
+      systemd.services.lean-velcom-bot = {
+        startAt = "*:00/5";  # every 5 minutes
+        # override in machine config
+        #environment = { "ZULIP_EMAIL" = "bot-bot@leanprover.zulipchat.com"; "ZULIP_API_KEY" = ""; "ZULIP_SITE" = "https://leanprover.zulipchat.com"; };
+        serviceConfig = {
+          DynamicUser = true;
+          StateDirectory = "velcom-bot";
+          Type = "exec";
+          ExecStart = "${packages.${system}.velcom-bot}/bin/velcom-bot.py --feed-file=${./velcom-urls} --data-dir=\${STATE_DIRECTORY}";
           TimeoutSec = "5min";
         };
       };
