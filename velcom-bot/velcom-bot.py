@@ -146,7 +146,9 @@ for url in urls:
         runs_data = json.load(f)['runs']
 
     new_hashes = set()
-    for run in runs_data:
+    # Newer runs appear first in the API results but should be posted last,
+    # so reverse the order.
+    for run in reversed(runs_data):
         run_id = run['run']['id']
         # Only process new runs.
         if run_id in processed_hashes:
