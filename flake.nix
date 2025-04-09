@@ -90,7 +90,7 @@ EOF
           DynamicUser = true;
           StateDirectory = "velcom-bot";
           Type = "exec";
-          ExecStart = "${packages.${system}.velcom-bot}/bin/velcom-bot.py --feed-file=${./velcom-urls} --data-dir=\${STATE_DIRECTORY}";
+          ExecStart = "${packages.${system}.velcom-bot}/bin/velcom-bot.py --urls-file=${./velcom-urls} --data-dir=\${STATE_DIRECTORY}";
           TimeoutSec = "5min";
         };
       };
