@@ -14,6 +14,9 @@ import zulip
 
 DEFAULT_DATA_DIR = os.path.expanduser(os.path.join("~", ".cache", "velcom-bot"))  # type: str
 
+# Maximum number of difference to include before truncating.
+MAX_DIFFS = 5
+
 usage = """Usage: Send summaries of VelCom benchmarks to Zulip.
 
 To use this script:
@@ -128,6 +131,19 @@ Author: {commit_author}
 {differences}
 """
 
+truncated_template = """**{commit_summary}**
+[`{commit_hash}`]({repo_url}/commit/{commit_hash})
+Author: {commit_author}
+
+[Significant benchmark differences]({run_url}):
+
+| | | | |
+|--|--|--|--:|
+{differences}
+
+[+ {truncated_count} more...]({run_url})
+"""
+
 for url in urls:
     hash_file = os.path.join(opts.data_dir, "processed-hashes")
     try:
@@ -184,16 +200,32 @@ for url in urls:
             # Skip non-significant results.
             continue
 
-        differences = "\n".join(format_difference(diff) for diff in significant_differences)
-        content = template.format(
-            commit_hash=commit_hash,
-            commit_author=commit_author,
-            commit_summary=commit_summary,
-            repo_url=repo_url,
-            run_id=run_id,
-            run_url=run_url,
-            differences=differences,
-        )
+        differences = "\n".join(format_difference(diff) for diff in significant_differences[:MAX_DIFFS])
+
+        if len(significant_differences) > MAX_DIFFS:
+            truncated_count = len(significant_differences) - MAX_DIFFS
+
+            content = truncated_template.format(
+                commit_hash=commit_hash,
+                commit_author=commit_author,
+                commit_summary=commit_summary,
+                repo_url=repo_url,
+                run_id=run_id,
+                run_url=run_url,
+                differences=differences,
+                truncated_count=truncated_count
+            )
+        else:
+            content = template.format(
+                commit_hash=commit_hash,
+                commit_author=commit_author,
+                commit_summary=commit_summary,
+                repo_url=repo_url,
+                run_id=run_id,
+                run_url=run_url,
+                differences=differences,
+                truncated_count=truncated_count
+            )
 
         message = {
             "type": "stream",
