@@ -115,7 +115,7 @@ def format_difference(difference: Dict[str, Any]) -> str:
         symbol = '•'
 
     percentage = relative * 100
-    return f"{symbol} {benchmark} --- {metric}: {round_to_human_units(absolute)}{unit} ({percentage:.3g} %)"
+    return f"| {symbol} | {benchmark} | {metric}: {round_to_human_units(absolute)} {unit} | {percentage:.3g} % |"
 
 template = """**{commit_summary}**
 [`{commit_hash}`]({repo_url}/commit/{commit_hash})
@@ -123,6 +123,8 @@ Author: {commit_author}
 
 [Significant benchmark differences]({run_url}):
 
+| | | | |
+|--|--|--|--:|
 {differences}
 """
 
