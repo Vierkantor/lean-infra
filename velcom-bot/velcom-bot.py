@@ -110,9 +110,9 @@ def format_difference(difference: Dict[str, Any]) -> str:
             symbol = ':check: ▼'
     elif interpretation == 'MORE_IS_BETTER':
         if absolute < 0:
-            symbol = ':red_square: :down:'
+            symbol = ':red_square: ▼'
         else:
-            symbol = ':check: :up:'
+            symbol = ':check: ▲'
     else:
         # Unsure how to interpret. Draw a bullet.
         symbol = '•'
