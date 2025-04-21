@@ -195,7 +195,9 @@ for url in urls:
         commit_summary = re.sub(r'(?<!\w)(#[0-9]+)\b', lambda m: repo_name + m.group(0), commit_summary)
 
         try:
-            significant_differences = run['significant_differences']
+            significant_differences = sorted(run['significant_differences'],
+                # Sort with largest absolute value first.
+                key=lambda diff: -abs(diff['reldiff']))
         except KeyError:
             # Skip non-significant results.
             continue
@@ -224,7 +226,6 @@ for url in urls:
                 run_id=run_id,
                 run_url=run_url,
                 differences=differences,
-                truncated_count=truncated_count
             )
 
         message = {
